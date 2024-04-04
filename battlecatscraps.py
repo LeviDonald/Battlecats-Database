@@ -1,8 +1,11 @@
 from urllib.request import urlopen
+import requests
 from bs4 import BeautifulSoup
 import re
 import sys
 import sqlite3
+from PIL import Image
+import os
 
 ZERO = 72.222222
 ONE = 91.481481
@@ -108,6 +111,7 @@ cat_links_table = ['https://battle-cats.fandom.com/wiki/Cat_(Normal_Cat)', 'http
 # atk_type_special = {"non.metal": ["Red", "Black", "Floating", "Angel", "Alien", "Zombie", "Aku", "Relic", "Traitless"], "all.enemies": ["Red", "Black", "Floating", "Metal", "Angel", "Alien", "Zombie", "Aku", "Relic", "Traitless"], "traited.enemies": ["Red", "Black", "Floating", "Metal", "Angel", "Alien", "Zombie", "Aku", "Relic"]}
 # atk_modes = ["Single Target", "Area Attack", "Omni Strike"]
 # conn, cur = connect_database(DATABASE_FILE)
+banned_characters = ['/', ':', '*', '?', '<', '>', '|']
 for i in cat_links_table:
     try:
         url = i
@@ -115,12 +119,24 @@ for i in cat_links_table:
         html_bytes = page.read()
         html = html_bytes.decode("utf-8")
         soup = BeautifulSoup(html, "html.parser")
+        form_names = []
+        forms = soup.find_all("th", {'style': 'font-size: 16px; color: white; background-color: #FF6811;border: solid #000;border-width: 1px 0;'})
+        for form_num, i in enumerate(forms, 1):
+            if "{" not in i.text and form_num < 4:
+                form_names.append(i.text.replace("\n", ""))
         image_files = soup.find('table', {'style': 'padding:5px;border-radius:0px 10px 0px 0px;position:relative;border:0px;margin:0px 0px;width:100%;'})
         image_files = image_files.find_all('a', {'class': 'image'})
+        count = 0
+        for form in range(len(form_names)):
+            for i in banned_characters:
+                if i in form_names[form]:
+                    form_names[form] = form_names[form].replace(i, "")
         for i in image_files:
             image_file = i.get("href")
             if not re.search("Placeholder.png", image_file):
-                print(image_file)
+                image_file = Image.open(requests.get(image_file, stream=True).raw)
+                image_file = image_file.save(os.path.abspath(f"static/images/{form_names[count]}.png"))
+                count += 1
 #         talents = soup.find('div', {'class': 'mw-parser-output'})
 #         talents = talents.find_all('ul')
 #         talent_tree = []
@@ -148,11 +164,8 @@ for i in cat_links_table:
 #                 x = x[1].rstrip(x[1][-1])
 #                 unit_cost_table.append(x.replace(",", ""))
 #         stats = soup.find('table', class_= 'stats-table')
-#         forms = soup.find_all("th", {'style': 'font-size: 16px; color: white; background-color: #FF6811;border: solid #000;border-width: 1px 0;'})
-#         form_names = []
-#         for form_num, i in enumerate(forms, 1):
-#             if "{" not in i.text and form_num < 4:
-#                 form_names.append(i.text.replace("\n", ""))
+
+        
 #         stats = stats.find_all('tr', class_='bg-light3')
 #         stats_table = []
 #         for i in stats:
