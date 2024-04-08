@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>u nits :)</h2>
+{% for unit in results %}
+<p><a href="/unit-view/{{unit[0]}}"><img src="/static/images/{{unit[2]}}.png"></a> : <a href="/unit-view/{{unit[0]}}">{{unit[1]}}</a></p>
+{% endfor %}
+{% endblock %}
