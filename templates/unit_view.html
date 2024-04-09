@@ -1,10 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
-<p>Normal Form : {{name1}}</p>
-<p>Evolved Form : {{name2}}</p>
+<h2>Cat Evolutions</h2>
+<p><b>Normal Form</b> : {{name1}}</p>
+<p><b>Evolved Form</b> : {{name2}}</p>
 {% if name3 %}
-<p>True Form : {{name3}}</p>
+<p><b>True Form</b> : {{name3}}</p>
 {% endif %}
 <h2>---</h2>
-<p>Rarity : {{rarity}}</p>
+<p><b>Rarity</b> : {{rarity}}</p>
+{% if talent_list %}
+<h2>---</h2>
+<h2>Talents</h2>
+{% for talent in talent_list %}
+<p>{{talent}}</p>
+{% endfor %}
+{% endif %}
 {% endblock %}
