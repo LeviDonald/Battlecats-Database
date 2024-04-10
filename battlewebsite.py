@@ -1,5 +1,6 @@
 import sqlite3
 from flask import Flask, render_template, redirect, url_for, request, session, abort
+import sys
 
 # Ease of access constants for HTML files
 DATABASE_FILE = "battlecats.db"
@@ -17,7 +18,11 @@ quantity = 10
 # Remove these characters from unit names to get the correct image file
 banned_characters = ['/', ':', '*', '?', '<', '>', '|']
 
- 
+
+def duplicate_remover(dup_list):
+    return list(dict.fromkeys(dup_list))
+
+
 def remove_characters(char_list, word):
     for char in char_list:
         word = word.replace(char, "")
@@ -76,21 +81,32 @@ def unit(unit_id):
                 talent_list.append(cur.fetchone()[0])
         else:
             talent_list = []
-        cur.execute("SELECT form_id, skill_id FROM skill_bridge WHERE cat_id = ?;", (unit_id,))
-        skills = cur.fetchall()
+        cur.execute("SELECT form_id, skill_id FROM skill_bridge WHERE cat_id = ? AND form_id = 1;", (unit_id,))
+        skills_1 = duplicate_remover(cur.fetchall())
+        cur.execute("SELECT form_id, skill_id FROM skill_bridge WHERE cat_id = ? AND form_id = 2;", (unit_id,))
+        skills_2 = duplicate_remover(cur.fetchall())
+        if results[2]:
+            cur.execute("SELECT form_id, skill_id FROM skill_bridge WHERE cat_id = ? AND form_id = 3;", (unit_id,))
+            skills_3 = duplicate_remover(cur.fetchall())
+        else:
+            skills_3 = []
         # Get all skills from skill_bridge that has unit_id, find skill_name and skill_desc using IDs from skill_bridge then append to skill_list
-        if skills:
-            skill_list = []
-            for skill in skills:
-                cur.execute("SELECT skill_name, skill_description FROM cat_skills WHERE skill_id = ?;", (skill[1]))
-                skill_info = cur.fetchone()
-                # [0] - form_id, [1] - skill_name, [2] - skill_description
-                skill_list.append(skill[0], skill_info[0], skill_info[1])
+        skill_list = [skills_1, skills_2, skills_3]
+        skill_info_list = []
+        for count, skills in enumerate(skill_list):
+            if skills:
+                for skill in skills:
+                    cur.execute("SELECT skill_name, skill_description FROM cat_skills WHERE skill_id = ?;", (skill[1],))
+                    skill_info = cur.fetchone()
+                    # [0] - form_id, [1] - skill_name, [2] - skill_description
+                    skill_info_list.append([skill[0], skill_info[0], skill_info[1]])
+                skill_list[count] = skill_info_list
+                skill_info_list = []
         conn.close()
-        return render_template(UNIT_VIEW_HTML, name1=results[0], name2=results[1], name3=results[2], rarity=rarity, talent_list=talent_list, skill_list=skill_list)
+        return render_template(UNIT_VIEW_HTML, name1=results[0], name2=results[1], name3=results[2], rarity=rarity, talent_list=talent_list, skills_1=skill_list[0], skills_2=skill_list[1], skills_3=skill_list[2])
     except Exception as e:
-        abort(404, "Incorrect ID")
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        abort(404, e, exc_tb.tb_lineno())
 
 # Starts application
 if __name__ == '__main__':

@@ -2,9 +2,23 @@
 {% block content %}
 <h2>Cat Evolutions</h2>
 <p><b>Normal Form</b> : {{name1}}</p>
+<p><i>Normal Form Skills:</i><p>
+{% for skill in skills_1 %}
+<p>{{skill[1]}} : {{skill[2]}}</p>
+{% endfor %}
+<p>-</p>
 <p><b>Evolved Form</b> : {{name2}}</p>
+<p><i>Evolved Form Skills:</i><p>
+{% for skill in skills_2 %}
+<p>{{skill[1]}} : {{skill[2]}}</p>
+{% endfor %}
+<p>-</p>
 {% if name3 %}
 <p><b>True Form</b> : {{name3}}</p>
+<p><i>True Form Skills:</i><p>
+{% for skill in skills_3 %}
+<p>{{skill[1]}} : {{skill[2]}}</p>
+{% endfor %}
 {% endif %}
 <h2>---</h2>
 <p><b>Rarity</b> : {{rarity}}</p>
