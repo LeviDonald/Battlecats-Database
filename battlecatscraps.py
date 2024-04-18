@@ -1,10 +1,10 @@
 from urllib.request import urlopen
-import requests
 from bs4 import BeautifulSoup
+# import requests
 import re
 import sys
 import sqlite3
-from PIL import Image
+# from PIL import Image
 import os
 
 ZERO = 72.222222
@@ -108,9 +108,9 @@ cat_links_table = ['https://battle-cats.fandom.com/wiki/Cat_(Normal_Cat)', 'http
 #     if cat_link is not None:
 #         cat_links_table.append("https://battle-cats.fandom.com"+cat_link.attrs.get("href"))
 # print(cat_links_table)
-# atk_type_special = {"non.metal": ["Red", "Black", "Floating", "Angel", "Alien", "Zombie", "Aku", "Relic", "Traitless"], "all.enemies": ["Red", "Black", "Floating", "Metal", "Angel", "Alien", "Zombie", "Aku", "Relic", "Traitless"], "traited.enemies": ["Red", "Black", "Floating", "Metal", "Angel", "Alien", "Zombie", "Aku", "Relic"]}
-# atk_modes = ["Single Target", "Area Attack", "Omni Strike"]
-# conn, cur = connect_database(DATABASE_FILE)
+atk_type_special = {"non.metal": ["Red", "Black", "Floating", "Angel", "Alien", "Zombie", "Aku", "Relic", "Traitless"], "all.enemies": ["Red", "Black", "Floating", "Metal", "Angel", "Alien", "Zombie", "Aku", "Relic", "Traitless"], "traited.enemies": ["Red", "Black", "Floating", "Metal", "Angel", "Alien", "Zombie", "Aku", "Relic"]}
+atk_modes = ["Single Target", "Area Attack", "Omni Strike"]
+conn, cur = connect_database(DATABASE_FILE)
 banned_characters = ['/', ':', '*', '?', '<', '>', '|']
 for i in cat_links_table:
     try:
@@ -131,168 +131,170 @@ for i in cat_links_table:
             for i in banned_characters:
                 if i in form_names[form]:
                     form_names[form] = form_names[form].replace(i, "")
-        for i in image_files:
-            image_file = i.get("href")
-            if not re.search("Placeholder.png", image_file):
-                image_file = Image.open(requests.get(image_file, stream=True).raw)
-                image_file = image_file.save(os.path.abspath(f"static/images/{form_names[count]}.png"))
-                count += 1
-#         talents = soup.find('div', {'class': 'mw-parser-output'})
-#         talents = talents.find_all('ul')
-#         talent_tree = []
-#         for i in talents:
-#             i = i.find_all('b')
-#             for x in i:
-#                 if x.find('a', {'title': 'Special Abilities'}):
-#                     x = x.find('a', {'title': 'Special Abilities'})
-#                     talent_tree.append(x.text)
-#                 if x.find('a', title=re.compile("Category:")):
-#                     x = x.find_all('a', title=re.compile("Category:"))
-#                     for v in x:
-#                         talent_tree.append(v.text)
-#         unit_name = soup.find('span', {'class': 'mw-page-title-main'}).contents[0]
-#         unit_name = unit_name.replace(")", "").split("(")
-#         unit_rarity = unit_name[len(unit_name)-1]
-#         unit_cost = soup.find("div", {'class': 'mw-parser-output'})
-#         unit_cost = unit_cost.find_all("li")
-#         unit_cost_table = []
-#         for i in unit_cost:
-#             txt = i.text
-#             x = re.search("^Chapter.2:.", txt)
-#             if x:
-#                 x = re.split("^Chapter.2:.", txt)
-#                 x = x[1].rstrip(x[1][-1])
-#                 unit_cost_table.append(x.replace(",", ""))
-#         stats = soup.find('table', class_= 'stats-table')
+        # for i in image_files:
+        #     image_file = i.get("href")
+        #     if not re.search("Placeholder.png", image_file):
+        #         image_file = Image.open(requests.get(image_file, stream=True).raw)
+        #         image_file = image_file.save(os.path.abspath(f"static/images/{form_names[count]}.png"))
+        #         count += 1
+        talents = soup.find('div', {'class': 'mw-parser-output'})
+        talents = talents.find_all('ul')
+        talent_tree = []
+        for i in talents:
+            i = i.find_all('b')
+            for x in i:
+                if x.find('a', {'title': 'Special Abilities'}):
+                    x = x.find('a', {'title': 'Special Abilities'})
+                    talent_tree.append(x.text)
+                if x.find('a', title=re.compile("Category:")):
+                    x = x.find_all('a', title=re.compile("Category:"))
+                    for v in x:
+                        talent_tree.append(v.text)
+        unit_name = soup.find('span', {'class': 'mw-page-title-main'}).contents[0]
+        unit_name = unit_name.replace(")", "").split("(")
+        unit_rarity = unit_name[len(unit_name)-1]
+        unit_cost = soup.find("div", {'class': 'mw-parser-output'})
+        unit_cost = unit_cost.find_all("li")
+        unit_cost_table = []
+        for i in unit_cost:
+            txt = i.text
+            x = re.search("^Chapter.2:.", txt)
+            if x:
+                x = re.split("^Chapter.2:.", txt)
+                x = x[1].rstrip(x[1][-1])
+                unit_cost_table.append(x.replace(",", ""))
+        stats = soup.find('table', class_= 'stats-table')
 
         
-#         stats = stats.find_all('tr', class_='bg-light3')
-#         stats_table = []
-#         for i in stats:
-#             fail = False
-#             i = i.text.replace(",", "").split("\n")
-#             i = list(filter(None, i))
-#             for x in i:
-#                 if x in atk_modes or "{" in x:
-#                     fail = True
-#                     break
-#                 elif len(stats_table) >= 3:
-#                     fail = True
-#                     break
-#             if fail:
-#                 continue
-#             hp = i[0].split()[0]
-#             atk = i[1].split()[0]
-#             atk_range = i[2]
-#             atk_time = i[3].split("f")[0]
-#             if atk_time == "-":
-#                 atk_time = 0
-#             speed = i[4]
-#             knockbacks = i[5].split()[0]
-#             if '~' in i[7]:
-#                 fastest_recharge = i[7].split("~")[1].split("seconds")[0].replace(" ", "")
-#             else:
-#                 fastest_recharge = i[7].split("-")[1].split("seconds")[0].replace(" ", "")
-#             stats_table.append([len(stats_table)+1, hp, atk, atk_range, atk_time, speed, knockbacks, fastest_recharge])
-#         if soup.find('td', {'style': 'font-weight:bold;border-left:1px solid black;text-align:right;'}):
-#             experience = soup.find('td', {'style': 'font-weight:bold;border-left:1px solid black;text-align:right;'}).text.replace(",", "").split()[0]
-#         else:
-#             experience = 0
-#         atk_type = soup.find('table', class_= 'stats-table')
+        stats = stats.find_all('tr', class_='bg-light3')
+        stats_table = []
+        for i in stats:
+            fail = False
+            i = i.text.replace(",", "").split("\n")
+            i = list(filter(None, i))
+            for x in i:
+                if x in atk_modes or "{" in x:
+                    fail = True
+                    break
+                elif len(stats_table) >= 3:
+                    fail = True
+                    break
+            if fail:
+                continue
+            hp = i[0].split()[0]
+            atk = i[1].split()[0]
+            atk_range = i[2]
+            atk_time = i[3].split("f")[0]
+            if atk_time == "-":
+                atk_time = 0
+            speed = i[4]
+            knockbacks = i[5].split()[0]
+            if '~' in i[7]:
+                fastest_recharge = i[7].split("~")[1].split("seconds")[0].replace(" ", "")
+            else:
+                fastest_recharge = i[7].split("-")[1].split("seconds")[0].replace(" ", "")
+            stats_table.append([len(stats_table)+1, hp, atk, atk_range, atk_time, speed, knockbacks, fastest_recharge])
+        if soup.find('td', {'style': 'font-weight:bold;border-left:1px solid black;text-align:right;'}):
+            experience = soup.find('td', {'style': 'font-weight:bold;border-left:1px solid black;text-align:right;'}).text.replace(",", "").split()[0]
+        else:
+            experience = 0
+        atk_type = soup.find('table', class_= 'stats-table')
 
-#         ability_text = atk_type.find_all('tr', class_="bg-light3")
-#         abilities = atk_type.find_all('a')
-#         atk_type = atk_type.find('a').get("href")
-#         atk_type = atk_type.split("#")
-#         atk_type = atk_type[len(atk_type)-1].split("_")
-#         atk_type = " ".join(atk_type)
-#         form1 = [atk_type,]
-#         form2 = []
-#         form3 = []
-#         form_type1 = []
-#         form_type2 = []
-#         form_type3 = []
-#         current_form = form1
-#         current_form_type = form1
-#         trueform_table = []
-#         for i in range(1, len(abilities)):
-#             current_ability = abilities[i].get("href")
-#             if "#" in abilities[i].get("href"):
-#                 current_ability = current_ability.split("#")
-#                 current_ability = current_ability[len(current_ability)-1].split("_")
-#                 current_ability = " ".join(current_ability)
-#             elif ":" in abilities[i].get("href"):
-#                 current_ability = current_ability.split(":")
-#                 current_ability = current_ability[len(current_ability)-1].split("_")[0]
-#             else:
-#                 current_ability = current_ability.split("/")
-#                 current_ability = current_ability[len(current_ability)-1].split("_")
-#                 current_ability = " ".join(current_ability)
-#             if current_ability.capitalize() in enemy_types:
-#                 if current_form == form1:
-#                     current_form_type = form_type1
-#                 elif current_form == form2:
-#                     current_form_type = form_type2
-#                 elif current_form == form3:
-#                     current_form_type = form_type3
-#                 current_form_type.append(current_ability.capitalize())
-#             if current_ability in atk_modes:
-#                 if current_form == form1:
-#                     current_form = form2
-#                 elif current_form == form2:
-#                     current_form = form3
-#                 else:
-#                     break
-#             current_form.append(current_ability.capitalize())
-#         if "Spirit" in form1:
-#             form1.remove("Spirit")
-#         if "Spirit" in form2:
-#             form2.remove("Spirit")
-#         if "Spirit" in form3:
-#             form3.remove("Spirit")
-#         if "Shield" in form1:
-#             form1.remove("Shield")
-#         if "Shield" in form2:
-#             form2.remove("Shield")
-#         if "Shield" in form3:
-#             form3.remove("Shield")
-#         type_forms = [duplicate_remover(form_type1), duplicate_remover(form_type2), duplicate_remover(form_type3)]
-#         count = 0
-#         for i in ability_text:
-#             ability = i.find("td", {'style': 'text-align: left;'})
-#             if ability:
-#                 if "{" not in str(ability):
-#                     ability = ability.text.replace("\n", "").lower()
-#                     for x in atk_type_special:
-#                         if re.search(x, ability):
-#                             type_forms[count] = atk_type_special[x]
-#                     count += 1
+        ability_text = atk_type.find_all('tr', class_="bg-light3")
+        abilities = atk_type.find_all('a')
+        atk_type = atk_type.find('a').get("href")
+        atk_type = atk_type.split("#")
+        atk_type = atk_type[len(atk_type)-1].split("_")
+        atk_type = " ".join(atk_type)
+        form1 = [atk_type,]
+        form2 = []
+        form3 = []
+        form_type1 = []
+        form_type2 = []
+        form_type3 = []
+        current_form = form1
+        current_form_type = form1
+        trueform_table = []
+        for i in range(1, len(abilities)):
+            current_ability = abilities[i].get("href")
+            if "#" in abilities[i].get("href"):
+                current_ability = current_ability.split("#")
+                current_ability = current_ability[len(current_ability)-1].split("_")
+                current_ability = " ".join(current_ability)
+            elif ":" in abilities[i].get("href"):
+                current_ability = current_ability.split(":")
+                current_ability = current_ability[len(current_ability)-1].split("_")[0]
+            else:
+                current_ability = current_ability.split("/")
+                current_ability = current_ability[len(current_ability)-1].split("_")
+                current_ability = " ".join(current_ability)
+            if current_ability.capitalize() in enemy_types:
+                if current_form == form1:
+                    current_form_type = form_type1
+                elif current_form == form2:
+                    current_form_type = form_type2
+                elif current_form == form3:
+                    current_form_type = form_type3
+                current_form_type.append(current_ability.capitalize())
+            if current_ability in atk_modes:
+                if current_form == form1:
+                    current_form = form2
+                elif current_form == form2:
+                    current_form = form3
+                else:
+                    break
+            current_form.append(current_ability.capitalize())
+        if "Spirit" in form1:
+            form1.remove("Spirit")
+        if "Spirit" in form2:
+            form2.remove("Spirit")
+        if "Spirit" in form3:
+            form3.remove("Spirit")
+        if "Shield" in form1:
+            form1.remove("Shield")
+        if "Shield" in form2:
+            form2.remove("Shield")
+        if "Shield" in form3:
+            form3.remove("Shield")
+        type_forms = [duplicate_remover(form_type1), duplicate_remover(form_type2), duplicate_remover(form_type3)]
+        count = 0
+        for i in ability_text:
+            ability = i.find("td", {'style': 'text-align: left;'})
+            if ability:
+                if "{" not in str(ability):
+                    ability = ability.text.replace("\n", "").lower()
+                    for x in atk_type_special:
+                        if re.search(x, ability):
+                            type_forms[count] = atk_type_special[x]
+                    count += 1
                             
-#         if soup.find('tr', class_= 'evolve-materials'):
-#             trueform_ing = soup.find('tr', class_= 'evolve-materials')
-#             trueform_ing = trueform_ing.find_all('td', {'style': "padding: 0;"})
-#             trueform_table = []
-#             for i in trueform_ing:
-#                 more_than_one = False
-#                 ing_amount = i.find_all('span', class_="game-numbers")
-#                 if i.a.img.attrs.get("data-image-name") != "Blank.png":
-#                     for ing in ing_amount:
-#                         if len(ing_amount) > 1 and more_than_one is False:
-#                             more_than_one = True
-#                             number_table = [i.a.img.attrs.get("data-image-name").split(".")[0], str(number_conversion(ing.attrs["style"].split(";")[3].split("-")[2].replace("px", "").replace(" ", ""))),]
-#                         elif len(ing_amount) > 1:
-#                             number_table[1] = number_table[1]+str(number_conversion(ing.attrs["style"].split(";")[3].split("-")[2].replace("px", "").replace(" ", "")))
-#                         else:
-#                             number_table = [i.a.img.attrs.get("data-image-name").split(".")[0], str(number_conversion(ing.attrs["style"].split(";")[3].split("-")[2].replace("px", "").replace(" ", ""))),]
-#                     trueform_table.append(number_table)
-#         #print({"Name": form_names, "Rarity": unit_rarity, "Cost": unit_cost_table[0], "HP": hp, "ATK": atk, "RANGE": atk_range, "ATK_TIME": atk_time, "SPEED": speed, "KNOCKBACKS": knockbacks, "RECHARGE": fastest_recharge, "EXP": experience, "FORM 1": form1, "FORM 2": form2, "FORM 3": form3})
-        
-#         cur.execute("SELECT cat_id FROM battle_cat WHERE cat_first=?;", (form_names[0],))
-#         cat_id = cur.fetchone()[0]
-        
+        if soup.find('tr', class_= 'evolve-materials'):
+            trueform_ing = soup.find('tr', class_= 'evolve-materials')
+            trueform_ing = trueform_ing.find_all('td', {'style': "padding: 0;"})
+            trueform_table = []
+            for i in trueform_ing:
+                more_than_one = False
+                ing_amount = i.find_all('span', class_="game-numbers")
+                if i.a.img.attrs.get("data-image-name") != "Blank.png":
+                    for ing in ing_amount:
+                        if len(ing_amount) > 1 and more_than_one is False:
+                            more_than_one = True
+                            number_table = [i.a.img.attrs.get("data-image-name").split(".")[0], str(number_conversion(ing.attrs["style"].split(";")[3].split("-")[2].replace("px", "").replace(" ", ""))),]
+                        elif len(ing_amount) > 1:
+                            number_table[1] = number_table[1]+str(number_conversion(ing.attrs["style"].split(";")[3].split("-")[2].replace("px", "").replace(" ", "")))
+                        else:
+                            number_table = [i.a.img.attrs.get("data-image-name").split(".")[0], str(number_conversion(ing.attrs["style"].split(";")[3].split("-")[2].replace("px", "").replace(" ", ""))),]
+                    trueform_table.append(number_table)
+        #print({"Name": form_names, "Rarity": unit_rarity, "Cost": unit_cost_table[0], "HP": hp, "ATK": atk, "RANGE": atk_range, "ATK_TIME": atk_time, "SPEED": speed, "KNOCKBACKS": knockbacks, "RECHARGE": fastest_recharge, "EXP": experience, "FORM 1": form1, "FORM 2": form2, "FORM 3": form3})
+        cur.execute("SELECT cat_id FROM battle_cat WHERE cat_first=?;", (form_names[0],))
+        cat_id = cur.fetchone()[0]
+        for i in unit_cost_table:
+            cur.execute("INSERT INTO cat_cost VALUES (?, ?);", (cat_id, i))
+            conn.commit()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(url, e, exc_tb.tb_lineno)
+conn.close()
 print("All done")
 
     # Battle_Cat table code
@@ -308,9 +310,7 @@ print("All done")
     #     conn.commit()
 
     # Cat_Cost table code
-    # for i in unit_cost_table:
-    #     cur.execute("INSERT INTO cat_cost VALUES (?, ?);", (cat_id, i))
-    #     conn.commit()
+    
 
     # Skill_Bridge table code
     # form_table = [duplicate_remover(form1), duplicate_remover(form2), duplicate_remover(form3)]

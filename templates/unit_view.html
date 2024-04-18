@@ -2,31 +2,62 @@
 {% block content %}
 <h2>Cat Evolutions</h2>
 <p><b>Normal Form</b> : {{name1}}</p>
+<img src="/static/images/{{image_names[0]}}.png">
 <p><i>Normal Form Skills:</i><p>
 {% for skill in skills_1 %}
 <p>{{skill[1]}} : {{skill[2]}}</p>
 {% endfor %}
+{% for type in types_1 %}
+<img src="/static/images/{{type.lower()}}.png">
+{% endfor %}
 <p>-</p>
 <p><b>Evolved Form</b> : {{name2}}</p>
+<img src="/static/images/{{image_names[1]}}.png">
 <p><i>Evolved Form Skills:</i><p>
 {% for skill in skills_2 %}
 <p>{{skill[1]}} : {{skill[2]}}</p>
 {% endfor %}
-<p>-</p>
+{% for type in types_2 %}
+<img src="/static/images/{{type.lower()}}.png">
+{% endfor %}
 {% if name3 %}
+<p>-</p>
 <p><b>True Form</b> : {{name3}}</p>
+<img src="/static/images/{{image_names[2]}}.png">
 <p><i>True Form Skills:</i><p>
 {% for skill in skills_3 %}
 <p>{{skill[1]}} : {{skill[2]}}</p>
 {% endfor %}
+{% for type in types_3 %}
+<img src="/static/images/{{type.lower()}}.png" alt="{{type}}">
+{% endfor %}
 {% endif %}
 <h2>---</h2>
+<h2>General Information</h2>
 <p><b>Rarity</b> : {{rarity}}</p>
+{% if experience > 0 %}
+<p><b>XP</b> - {{experience}}</p>
+{% endif %}
+<p><b>Cost</b></p>
+{% for cost in costs %}
+<p>${{cost[0]}}</p>
+{% endfor %}
 {% if talent_list %}
 <h2>---</h2>
 <h2>Talents</h2>
 {% for talent in talent_list %}
 <p>{{talent}}</p>
 {% endfor %}
+{% endif %}
+{% if trueform_mats %}
+<h2>---</h2>
+<h2>Trueform Materials</h2>
+{% for material in trueform_mats %}
+<!-- material[0] - Ingredient Name, material[1] - Ingredient Amount -->
+<p>{{material[0]}} ({{material[1]}}) : <img src="/static/images/{{material[0]}}.png"></p>
+{% endfor %}
+{% if trueform_experience %}
+<p><b>XP Required</b> : {{trueform_experience}}</p>
+{% endif %}
 {% endif %}
 {% endblock %}

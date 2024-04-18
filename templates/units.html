@@ -1,7 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>u nits :)</h2>
-{% for unit in results %}
-<p><a href="/unit-view/{{unit[0]}}"><img src="/static/images/{{unit[2]}}.png"></a> : <a href="/unit-view/{{unit[0]}}">{{unit[1]}}</a></p>
-{% endfor %}
+<br>
+<form method="POST" action="/search">
+    <input type="text" placeholder="Search for a cat..." name="search_text" hx-get="/search" hx-target="#unit_content" maxlength="25">
+    <input type="submit" value="Submit">
+<div id="unit_content">
+    {% if results %}
+    {% for unit in results %}
+    <p><a href="/unit-view/{{unit[0]}}"><img src="/static/images/{{unit[2]}}.png"></a> : <a href="/unit-view/{{unit[0]}}">{{unit[1]}}</a></p>
+    {% endfor %}
+    {% else %}
+    <p>No results!</p>
+    {% endif %}
+</div>
 {% endblock %}
