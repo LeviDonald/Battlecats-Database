@@ -1,6 +1,5 @@
 import sqlite3
 from flask import Flask, render_template, redirect, url_for, request, session, abort
-import sys
 
 # Ease of access constants for HTML files
 DATABASE_FILE = "battlecats.db"
@@ -27,6 +26,10 @@ def remove_characters(char_list, word):
     for char in char_list:
         word = word.replace(char, "")
     return word
+
+
+def frame_to_second(frames):
+    return round((frames / 30), 2)
 
 
 # Connecting to database function (returns cursor and connection)
@@ -77,6 +80,10 @@ def unit(unit_id):
     results = cur.fetchone()
     if results:
         try:
+            if results[2]:
+                form_names = ["Normal", "Evolved", "True"]
+            else:
+                form_names = ["Normal", "Evolved"]
             results = list(results)
             cur.execute("SELECT rarity_name FROM cat_rarity WHERE rarity_id = ?;", (results[3],))
             rarity = cur.fetchone()[0]
@@ -139,15 +146,21 @@ def unit(unit_id):
             image_names = []
             for i in range(0, 3):
                 if results[i] is not None:
-                    image_names.append(remove_characters(banned_characters, results[i])) 
+                    image_names.append(remove_characters(banned_characters, results[i]))
+            stat_list = []
+            for i in range(1, len(form_names)+1):
+                cur.execute("SELECT hp, attack, attack_range, attack_frequency, speed, knockbacks, recharge FROM battle_bridge WHERE cat_id = ? AND form_id = ?;", (unit_id, i))
+                # [0] - HP, [1] - ATK, [2] - ATK RANGE, [3] - ATK FREQUENCY, [4] SPEED, [5] KB, [6] RECHARGE
+                current_stats = list(cur.fetchone())
+                current_stats[3] = frame_to_second(current_stats[3])
+                stat_list.append(current_stats)
             conn.close()
-            return render_template(UNIT_VIEW_HTML, name1=results[0], name2=results[1], name3=results[2], rarity=rarity, talent_list=talent_list, skills_1=skill_list[0], skills_2=skill_list[1], skills_3=skill_list[2],
-                                types_1=type_list[0], types_2=type_list[1], types_3=type_list[2], experience=results[4], costs=cat_costs, trueform_mats=trueform_materials, trueform_experience=trueform_experience, image_names=image_names)
+            return render_template(UNIT_VIEW_HTML, names=results, form_names=form_names, rarity=rarity, talent_list=talent_list, skill_list=skill_list, stat_list=stat_list,
+                                type_list=type_list, experience=results[4], costs=cat_costs, trueform_mats=trueform_materials, trueform_experience=trueform_experience, image_names=image_names)
         except Exception as e:
             abort(404, e)
     else:
         abort(404, "Unit does not exist!")
-        
 
 
 @app.route('/search', methods=['GET', 'POST'])

@@ -1,37 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
 <h2>Cat Evolutions</h2>
-<p><b>Normal Form</b> : {{name1}}</p>
-<img src="/static/images/{{image_names[0]}}.png">
-<p><i>Normal Form Skills:</i><p>
-{% for skill in skills_1 %}
+{% for i in range(form_names|length) %}
+<p><b>{{form_names[i]}} Form</b> : {{names[i]}}</p>
+<img src="/static/images/{{image_names[i]}}.png">
+<p><i>{{form_names[i]}} Form Skills:</i><p>
+{% for skill in skill_list[i] %}
 <p>{{skill[1]}} : {{skill[2]}}</p>
 {% endfor %}
-{% for type in types_1 %}
-<img src="/static/images/{{type.lower()}}.png">
-{% endfor %}
-<p>-</p>
-<p><b>Evolved Form</b> : {{name2}}</p>
-<img src="/static/images/{{image_names[1]}}.png">
-<p><i>Evolved Form Skills:</i><p>
-{% for skill in skills_2 %}
-<p>{{skill[1]}} : {{skill[2]}}</p>
-{% endfor %}
-{% for type in types_2 %}
-<img src="/static/images/{{type.lower()}}.png">
-{% endfor %}
-{% if name3 %}
-<p>-</p>
-<p><b>True Form</b> : {{name3}}</p>
-<img src="/static/images/{{image_names[2]}}.png">
-<p><i>True Form Skills:</i><p>
-{% for skill in skills_3 %}
-<p>{{skill[1]}} : {{skill[2]}}</p>
-{% endfor %}
-{% for type in types_3 %}
-<img src="/static/images/{{type.lower()}}.png" alt="{{type}}">
-{% endfor %}
+{% if i == 0 %}
+<h2>Stats: (LVL 1)</h2>
+{% else %}
+<h2>Stats: (MAX LVL)</h2>
 {% endif %}
+<p><b>HP</b> - {{stat_list[i][0]}}</p>
+<p><b>ATK</b> - {{stat_list[i][1]}}</p>
+<p><b>ATK RANGE</b> - {{stat_list[i][2]}}</p>
+<p><b>ATK FREQUENCY</b> - {{stat_list[i][3]}} secs</p>
+<p><b>SPEED</b> - {{stat_list[i][4]}}</p>
+<p><b>KB</b> - {{stat_list[i][5]}}</p>
+{% for type in type_list[i] %}
+<img src="/static/images/{{type.lower()}}.png">
+{% endfor %}
+<p>-</p>
+{% endfor %}
 <h2>---</h2>
 <h2>General Information</h2>
 <p><b>Rarity</b> : {{rarity}}</p>
